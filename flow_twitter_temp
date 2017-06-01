@@ -1,0 +1,200 @@
+[
+    {
+        "id": "7f4dd36d.81291c",
+        "type": "tab",
+        "label": "Twitter投稿"
+    },
+    {
+        "id": "fc2789fe.49b6b8",
+        "type": "websocket in",
+        "z": "7f4dd36d.81291c",
+        "name": "sakura.io WebSocket",
+        "server": "",
+        "client": "",
+        "x": 140,
+        "y": 80,
+        "wires": [
+            [
+                "e90c5dc8.4987"
+            ]
+        ]
+    },
+    {
+        "id": "8a5961f6.2ee27",
+        "type": "trigger",
+        "z": "7f4dd36d.81291c",
+        "op1": "1",
+        "op2": "0",
+        "op1type": "pay",
+        "op2type": "nul",
+        "duration": "10",
+        "extend": false,
+        "units": "min",
+        "reset": "",
+        "name": "",
+        "x": 160,
+        "y": 400,
+        "wires": [
+            [
+                "b87c1ade.0e3b18"
+            ]
+        ]
+    },
+    {
+        "id": "d389e952.8fe258",
+        "type": "twitter out",
+        "z": "7f4dd36d.81291c",
+        "twitter": "",
+        "name": "Tweet",
+        "x": 630,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "b87c1ade.0e3b18",
+        "type": "function",
+        "z": "7f4dd36d.81291c",
+        "name": "メッセージ化",
+        "func": "msg.payload = 'さくらインターネットのハンズオンで温度情報を取得中！ただ今の現地温度は'+msg.payload+'度だよ。やっと正式サービスが始まりました、今後ともよろしくお願いします！ #sakuraio #さくらインターネット';return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 400,
+        "wires": [
+            [
+                "4954153c.93336c",
+                "d389e952.8fe258"
+            ]
+        ]
+    },
+    {
+        "id": "4954153c.93336c",
+        "type": "debug",
+        "z": "7f4dd36d.81291c",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 650,
+        "y": 400,
+        "wires": []
+    },
+    {
+        "id": "1f9a3b1b.415eb5",
+        "type": "function",
+        "z": "7f4dd36d.81291c",
+        "name": "小数第一位に四捨五入",
+        "func": "msg.payload = Math.round(msg.payload.value*10)/10;return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 260,
+        "y": 320,
+        "wires": [
+            [
+                "2e5ca2c9.22032e",
+                "8a5961f6.2ee27"
+            ]
+        ]
+    },
+    {
+        "id": "2e5ca2c9.22032e",
+        "type": "debug",
+        "z": "7f4dd36d.81291c",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 650,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "e90c5dc8.4987",
+        "type": "json",
+        "z": "7f4dd36d.81291c",
+        "name": "String→Objectへの変換",
+        "x": 470,
+        "y": 80,
+        "wires": [
+            [
+                "71d0da74.828644"
+            ]
+        ]
+    },
+    {
+        "id": "71d0da74.828644",
+        "type": "switch",
+        "z": "7f4dd36d.81291c",
+        "name": "Type＝Channelsだけ通過",
+        "property": "payload.type",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "channels",
+                "vt": "str"
+            }
+        ],
+        "checkall": "true",
+        "outputs": 1,
+        "x": 190,
+        "y": 160,
+        "wires": [
+            [
+                "650b9fd6.09d85",
+                "1ca8a58c.20977a"
+            ]
+        ]
+    },
+    {
+        "id": "650b9fd6.09d85",
+        "type": "function",
+        "z": "7f4dd36d.81291c",
+        "name": "Channel 0 JSONパース",
+        "func": "var msg = {payload: msg.payload.payload.channels[0]};return msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 230,
+        "y": 240,
+        "wires": [
+            [
+                "1f9a3b1b.415eb5",
+                "bff4e268.54b13"
+            ]
+        ]
+    },
+    {
+        "id": "bff4e268.54b13",
+        "type": "debug",
+        "z": "7f4dd36d.81291c",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 650,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "1ca8a58c.20977a",
+        "type": "debug",
+        "z": "7f4dd36d.81291c",
+        "name": "",
+        "active": false,
+        "console": "false",
+        "complete": "false",
+        "x": 650,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "4917182f.3a1f38",
+        "type": "comment",
+        "z": "7f4dd36d.81291c",
+        "name": "Twitter投稿サンプル",
+        "info": "## sakura.ioからのデータを加工\nsakura.ioのWebSocket`wss://api.sakura.io/ws/v1/.....`サービスから送信されたJSONデータから温度を取り出し、Twitter投稿する。\n> [sakura.io コントロールパネル](https://secure.sakura.ad.jp/iot/)",
+        "x": 110,
+        "y": 40,
+        "wires": []
+    }
+]
